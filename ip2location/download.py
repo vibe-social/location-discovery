@@ -9,7 +9,7 @@ script_dir = os.path.dirname(os.path.realpath(__file__))
 # Read the IP2Location environment variables
 print("Reading IP2Location environment variables...")
 load_dotenv()
-IP_2_LOCATION_TOKEN = os.environ.get("IP_2_LOCATION_TOKEN")
+IP_2_LOCATION_TOKEN = os.getenv("IP_2_LOCATION_TOKEN")
 print("IP2Location environment variables read.")
 
 # Download the IP2Location database
