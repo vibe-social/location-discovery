@@ -10,7 +10,6 @@ from controllers.reverse_geocode import reverse_geocode
 
 # Load the IP2Location database and export it to a global variable
 database = load_database()
-globals()["database"] = database
 
 # Define the Flask app and the API
 app = Flask(__name__)
@@ -32,7 +31,7 @@ geocode_model = api.model(
     "Geocode",
     description="Convert an IP address to geographic coordinates (latitude and longitude).",
     model={
-        "address": fields.String(
+        "ip_address": fields.String(
             required=True, description="IP address to geocode", example="123.456.789.0"
         )
     },
@@ -95,9 +94,9 @@ class Geocode(Resource):
     @api.expect(geocode_model)
     def post(self):
         data = request.get_json()
-        address = data.get("address")
+        ip_address = data.get("ip_address")
 
-        latitude, longitude = geocode(address)
+        latitude, longitude = geocode(database, ip_address)
 
         return jsonify({"latitude": latitude, "longitude": longitude})
 
@@ -111,9 +110,9 @@ class ReverseGeocode(Resource):
         latitude = data.get("latitude")
         longitude = data.get("longitude")
 
-        address = reverse_geocode(latitude, longitude)
+        ip_address = reverse_geocode(database, latitude, longitude)
 
-        return jsonify({"address": address})
+        return jsonify({"ip_address": ip_address})
 
 
 # Distance endpoint
