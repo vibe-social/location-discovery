@@ -14,9 +14,8 @@ print("IP2Location environment variables read.")
 
 # Download the IP2Location database
 print("Downloading IP2Location database...")
-url = (
-    f"https://www.ip2location.com/download/?token={IP_2_LOCATION_TOKEN}&file=DB5LITECSV"
-)
+url = f"https://www.ip2location.com/download/?token={IP_2_LOCATION_TOKEN}&file=DB11LITECSV"
+print(url)
 response = requests.get(url)
 
 if response.status_code == 200:
@@ -34,8 +33,8 @@ if response.status_code == 200:
             zip_ref.extractall(".")
         print("Unzip complete.")
     except zipfile.BadZipFile:
-        print("Error unzipping IP2Location database. Bad zip file.")
+        raise Exception("Error unzipping IP2Location database. Bad zip file.")
 else:
-    print(
+    raise Exception(
         f"Error downloading IP2Location database. Status code: {response.status_code}"
     )
