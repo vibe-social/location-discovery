@@ -1,3 +1,5 @@
+import os
+from dotenv import load_dotenv
 from controllers.geocode import geocode
 from flask import Flask, request, jsonify
 from flask_restx import Api, Resource, fields
@@ -12,8 +14,13 @@ api = Api(
     version="1.0",
     title="Location Discovery API",
     description="API for location discovery",
-    doc="/docs",
+    doc="/openapi",
 )
+
+# Read the environment variables
+load_dotenv()
+LOCATION_DISCOVERY_SERVER_MODE = os.getenv("LOCATION_DISCOVERY_SERVER_MODE", "debug")
+LOCATION_DISCOVERY_SERVER_PORT = os.getenv("LOCATION_DISCOVERY_SERVER_PORT", 8080)
 
 # Define the OpenAPI models
 geocode_model = api.model(
@@ -122,4 +129,8 @@ class Health(Resource):
 
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(
+        debug=LOCATION_DISCOVERY_SERVER_MODE == "debug",
+        host="0.0.0.0",
+        port=LOCATION_DISCOVERY_SERVER_PORT,
+    )

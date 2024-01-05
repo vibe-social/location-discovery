@@ -1,3 +1,6 @@
+# Ignore config files
+.env
+
 # Ignore python environment
 .venv/
 
