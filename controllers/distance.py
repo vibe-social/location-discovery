@@ -16,8 +16,7 @@ def calculate_distance(
     Returns:
         float: The distance between the two points in kilometers.
     """
-    # Convert latitude and longitude to
-    # spherical coordinates in radians.
+    # Convert latitude and longitude to spherical coordinates in radians
     degrees_to_radians = math.pi / 180.0
 
     # phi = 90 - latitude
@@ -28,17 +27,11 @@ def calculate_distance(
     theta1 = longitude1 * degrees_to_radians
     theta2 = longitude2 * degrees_to_radians
 
-    # Compute spherical distance from spherical coordinates.
-    # For two locations in spherical coordinates
-    # (1, theta, phi) and (1, theta, phi)
-    # cosine( arc length ) =
-    #    sin phi sin phi' cos(theta-theta') + cos phi cos phi'
-    # distance = rho * arc length
+    # Compute spherical distance from spherical coordinates
     cos = math.sin(phi1) * math.sin(phi2) * math.cos(theta1 - theta2) + math.cos(
         phi1
     ) * math.cos(phi2)
     arc = math.acos(cos)
 
-    # Multiply arc by the radius of the earth
-    # to get distance in kilometers.
-    return arc * 6373.0
+    # Multiply arc by the radius of the earth to get distance in kilometers
+    return arc * 6371.0
