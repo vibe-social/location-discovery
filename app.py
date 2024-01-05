@@ -3,9 +3,14 @@ from dotenv import load_dotenv
 from controllers.geocode import geocode
 from flask import Flask, request, jsonify
 from flask_restx import Api, Resource, fields
+from ip2location.database import load_database
 from controllers.distance import calculate_distance
 from controllers.reverse_geocode import reverse_geocode
 
+
+# Load the IP2Location database and export it to a global variable
+database = load_database()
+globals()["database"] = database
 
 # Define the Flask app and the API
 app = Flask(__name__)
@@ -70,6 +75,13 @@ distance_model = api.model(
         ),
     },
 )
+database_model = api.model(
+    "Database",
+    description="IP2Location database",
+    model={
+        "database": fields.String(required=True, description="IP2Location database")
+    },
+)
 health_model = api.model(
     "Health",
     description="Health check",
@@ -118,6 +130,15 @@ class Distance(Resource):
         distance = calculate_distance(latitude1, longitude1, latitude2, longitude2)
 
         return jsonify({"distance": distance})
+
+
+# Database endpoint
+@api.route("/database")
+class Database(Resource):
+    @api.expect(database_model)
+    def get(self):
+        # Select random 100 elements from database
+        return jsonify(database.sample(n=100).to_json(orient="records"))
 
 
 # Health check endpoint
