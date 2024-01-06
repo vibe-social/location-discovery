@@ -1,6 +1,5 @@
 import os
 import pandas as pd
-from ip2location.download import download_database
 
 
 def load_database() -> pd.DataFrame:
@@ -12,11 +11,6 @@ def load_database() -> pd.DataFrame:
     print("Loading IP2Location database...")
     # Get the directory where the script is located
     script_dir = os.path.dirname(os.path.realpath(__file__))
-
-    # Check if the database file exists
-    if not os.path.isfile(f"{script_dir}/IP2LOCATION-LITE-DB5.CSV"):
-        # Download the database file
-        download_database()
 
     # Define the column names
     column_names = [
