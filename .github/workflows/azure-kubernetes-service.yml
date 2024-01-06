@@ -30,6 +30,8 @@ jobs:
         with:
           push: true
           tags: ${{ env.CONTAINER_NAME }}:${{ github.sha }}
+          secrets: |
+            "IP_2_LOCATION_TOKEN=${{ secrets.IP_2_LOCATION_TOKEN }}"
   deploy:
     permissions:
       actions: read

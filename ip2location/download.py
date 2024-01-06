@@ -17,7 +17,8 @@ def download_database():
 
     # Download the IP2Location database
     print("Downloading IP2Location database...")
-    url = f"https://www.ip2location.com/download/?token={IP_2_LOCATION_TOKEN}&file=DB11LITECSV"
+    url = f"https://www.ip2location.com/download/?token={IP_2_LOCATION_TOKEN}&file=DB5LITECSV"
+    print(url)  # TODO - remove
     response = requests.get(url)
 
     if response.status_code == 200:
@@ -43,4 +44,5 @@ def download_database():
 
 
 if __name__ == "__main__":
+    # Download the IP2Location database
     download_database()
