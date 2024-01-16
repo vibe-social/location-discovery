@@ -14,14 +14,12 @@ print("IP2Location environment variables read.")
 
 # Download the IP2Location database
 print("Downloading IP2Location database...")
-url = (
-    f"https://www.ip2location.com/download/?token={IP_2_LOCATION_TOKEN}&file=DB5LITECSV"
-)
+url = f"https://www.ip2location.com/download/?token={IP_2_LOCATION_TOKEN}&file=DB11LITECSV"
 response = requests.get(url)
 
 if response.status_code == 200:
     # Save the downloaded content to a file
-    with open(f"{script_dir}/IP2LOCATION-LITE-DB5.CSV.ZIP", "wb") as zip_file:
+    with open(f"{script_dir}/IP2LOCATION-LITE-DB11.CSV.ZIP", "wb") as zip_file:
         zip_file.write(response.content)
     print("Download complete.")
 
@@ -29,7 +27,7 @@ if response.status_code == 200:
     print("Unzipping IP2Location database...")
     try:
         with zipfile.ZipFile(
-            f"{script_dir}/IP2LOCATION-LITE-DB5.CSV.ZIP", "r"
+            f"{script_dir}/IP2LOCATION-LITE-DB11.CSV.ZIP", "r"
         ) as zip_ref:
             zip_ref.extractall(script_dir)
         print("Unzip complete.")

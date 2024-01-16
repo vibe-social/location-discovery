@@ -1,18 +1,33 @@
 import os
 from dotenv import load_dotenv
+from flask import render_template
 from controllers.geocode import geocode
 from flask import Flask, request, jsonify
-from flask_restx import Api, Resource, fields
+from flask_restx import Api, Resource, fields, apidoc
 from ip2location.database import load_database
 from controllers.distance import calculate_distance
 from controllers.reverse_geocode import reverse_geocode
 
-
 # Load the IP2Location database and export it to a global variable
 database = load_database()
 
+# Read the environment variables
+load_dotenv()
+LOCATION_DISCOVERY_SERVER_MODE = os.getenv("LOCATION_DISCOVERY_SERVER_MODE", "debug")
+LOCATION_DISCOVERY_SERVER_PORT = os.getenv("LOCATION_DISCOVERY_SERVER_PORT", 8080)
+LOCATION_DISCOVERY_PREFIX = (
+    "/location-discovery" if LOCATION_DISCOVERY_SERVER_MODE == "release" else ""
+)
+
+
+@apidoc.apidoc.add_app_template_global
+def swagger_static(filename):
+    return f"{LOCATION_DISCOVERY_PREFIX}/swaggerui/{filename}"
+
+
 # Define the Flask app and the API
 app = Flask(__name__)
+app.config["SWAGGER_UI_DOC_EXPANSION"] = "list"
 api = Api(
     app,
     version="1.0",
@@ -20,11 +35,6 @@ api = Api(
     description="API for location discovery",
     doc="/openapi",
 )
-
-# Read the environment variables
-load_dotenv()
-LOCATION_DISCOVERY_SERVER_MODE = os.getenv("LOCATION_DISCOVERY_SERVER_MODE", "debug")
-LOCATION_DISCOVERY_SERVER_PORT = os.getenv("LOCATION_DISCOVERY_SERVER_PORT", 8080)
 
 # Define the OpenAPI models
 geocode_model = api.model(
@@ -74,18 +84,6 @@ distance_model = api.model(
         ),
     },
 )
-database_model = api.model(
-    "Database",
-    description="IP2Location database",
-    model={
-        "database": fields.String(required=True, description="IP2Location database")
-    },
-)
-health_model = api.model(
-    "Health",
-    description="Health check",
-    model={"status": fields.String(required=True, description="Health status")},
-)
 
 
 # Geocode endpoint
@@ -134,7 +132,6 @@ class Distance(Resource):
 # Database endpoint
 @api.route("/database")
 class Database(Resource):
-    @api.expect(database_model)
     def get(self):
         # Select random 100 elements from database
         return jsonify(database.sample(n=100).to_json(orient="records"))
@@ -143,9 +140,18 @@ class Database(Resource):
 # Health check endpoint
 @api.route("/health")
 class Health(Resource):
-    @api.expect(health_model)
     def get(self):
         return {"status": "ok"}
+
+
+# Swagger UI endpoint
+@api.documentation
+def custom_ui():
+    return render_template(
+        "swagger-ui.html",
+        title=api.title,
+        specs_url=f"{LOCATION_DISCOVERY_PREFIX}/swagger.json",
+    )
 
 
 if __name__ == "__main__":

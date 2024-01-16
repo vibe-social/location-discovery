@@ -22,10 +22,12 @@ def load_database() -> pd.DataFrame:
         "ip_address_city",
         "ip_address_latitude",
         "ip_address_longitude",
+        "ip_address_zipcode",
+        "ip_address_timezone",
     ]
 
     # Specify the path to the CSV file
-    csv_file_path = f"{script_dir}/IP2LOCATION-LITE-DB5.CSV"
+    csv_file_path = f"{script_dir}/IP2LOCATION-LITE-DB11.CSV"
 
     # Load the IP2Location database and save it to the pandas dataframe
     database = pd.read_csv(csv_file_path, low_memory=True)
