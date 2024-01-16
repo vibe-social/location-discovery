@@ -1,12 +1,13 @@
 import os
 from dotenv import load_dotenv
-from flask import render_template
 from controllers.geocode import geocode
-from flask import Flask, request, jsonify
-from flask_restx import Api, Resource, fields, apidoc
 from ip2location.database import load_database
 from controllers.distance import calculate_distance
+from flask_restx import Api, Resource, fields, apidoc
 from controllers.reverse_geocode import reverse_geocode
+from flask import Flask, Blueprint, render_template, request, jsonify
+
+LOCATION_DISCOVERY = "location-discovery"
 
 # Load the IP2Location database and export it to a global variable
 database = load_database()
@@ -16,7 +17,7 @@ load_dotenv()
 LOCATION_DISCOVERY_SERVER_MODE = os.getenv("LOCATION_DISCOVERY_SERVER_MODE", "debug")
 LOCATION_DISCOVERY_SERVER_PORT = os.getenv("LOCATION_DISCOVERY_SERVER_PORT", 8080)
 LOCATION_DISCOVERY_PREFIX = (
-    "/location-discovery" if LOCATION_DISCOVERY_SERVER_MODE == "release" else ""
+    f"/{LOCATION_DISCOVERY}" if LOCATION_DISCOVERY_SERVER_MODE == "release" else ""
 )
 
 
@@ -28,12 +29,14 @@ def swagger_static(filename):
 # Define the Flask app and the API
 app = Flask(__name__)
 app.config["SWAGGER_UI_DOC_EXPANSION"] = "list"
+api_blueprint = Blueprint(LOCATION_DISCOVERY, __name__)
 api = Api(
-    app,
+    api_blueprint,
     version="1.0",
     title="Location Discovery API",
     description="API for location discovery",
     doc="/openapi",
+    url_prefix=LOCATION_DISCOVERY,
 )
 
 # Define the OpenAPI models
@@ -155,6 +158,7 @@ def custom_ui():
 
 
 if __name__ == "__main__":
+    app.register_blueprint(api_blueprint, url_prefix=f"/{LOCATION_DISCOVERY}")
     app.run(
         debug=LOCATION_DISCOVERY_SERVER_MODE == "debug",
         host="0.0.0.0",
